@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クマムシコレクション - 緩歩動物の世界</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- メインコンテナ -->
+    <div class="game-container">
+        <!-- ヘッダー -->
+        <header class="game-header">
+            <h1 class="game-title">🔬 クマムシコレクション</h1>
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-label">湿度:</span>
+                    <span id="humidity" class="status-value">65%</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">温度:</span>
+                    <span id="temperature" class="status-value">20°C</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">日差し:</span>
+                    <span id="sunlight" class="status-value">中</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">コレクション:</span>
+                    <span id="collection-count" class="status-value">0/50</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- メインゲーム画面 -->
+        <main class="game-main" id="main-screen">
+            <!-- コロニー表示エリア -->
+            <section class="colony-section">
+                <div class="section-header">
+                    <h2>🏠 あなたのクマムシコロニー</h2>
+                    <div class="colony-controls">
+                        <button class="btn btn--primary" id="cryptobiosis-all">全体クリプトビオシス</button>
+                        <button class="btn btn--secondary" id="revive-all">全体復活</button>
+                    </div>
+                </div>
+                <div class="colony-grid" id="colony-grid">
+                    <!-- クマムシ個体がここに動的に表示される -->
+                </div>
+                <div class="colony-status">
+                    <p>空きスロット: <span id="empty-slots">8</span>/8</p>
+                </div>
+            </section>
+
+            <!-- アクションメニュー -->
+            <section class="action-menu">
+                <button class="btn btn--primary action-btn" id="explore-btn">
+                    🌿 探索する
+                </button>
+                <button class="btn btn--secondary action-btn" id="collection-btn">
+                    📚 図鑑を見る
+                </button>
+                <button class="btn btn--secondary action-btn" id="breeding-btn">
+                    🧬 合成する
+                </button>
+                <button class="btn btn--secondary action-btn" id="defense-btn">
+                    ⚔️ 防衛準備
+                </button>
+                <button id="lab-btn" class="action-btn btn--secondary">
+                    🧪研究ラボ
+                </button>
+
+            </section>
+        </main>
+
+        <!-- 探索画面 -->
+        <section class="screen" id="explore-screen" style="display: none;">
+            <div class="screen-header">
+                <h2>🔍 苔の探索</h2>
+                <button class="btn btn--outline" id="back-to-main">メインに戻る</button>
+            </div>
+            <div class="moss-areas">
+                <div class="moss-area" data-area="urban">
+                    <h3>🏙️ ギンゴケ（都市部）</h3>
+                    <p>アスファルトやコンクリートの上にも生える丈夫なコケ</p>
+                    <div class="area-stats">
+                        <span>湿度: 40%</span> | <span>温度: 25°C</span>
+                    </div>
+                    <button class="btn btn--primary explore-area-btn">探索する</button>
+                </div>
+                <div class="moss-area" data-area="forest">
+                    <h3>🌲 ハイゴケ（森林）</h3>
+                    <p>湿った森林に分厚く生えるコケ</p>
+                    <div class="area-stats">
+                        <span>湿度: 80%</span> | <span>温度: 18°C</span>
+                    </div>
+                    <button class="btn btn--primary explore-area-btn">探索する</button>
+                </div>
+                <div class="moss-area" data-area="desert">
+                    <h3>🏜️ スナゴケ（乾燥地）</h3>
+                    <p>乾燥に強く荒地でも生育するコケ</p>
+                    <div class="area-stats">
+                        <span>湿度: 20%</span> | <span>温度: 35°C</span>
+                    </div>
+                    <button class="btn btn--primary explore-area-btn">探索する</button>
+                </div>
+                <div class="moss-area" data-area="wetland">
+                    <h3>💧 ミズゴケ（湿地）</h3>
+                    <p>水分を大量に保持する湿地のコケ</p>
+                    <div class="area-stats">
+                        <span>湿度: 95%</span> | <span>温度: 15°C</span>
+                    </div>
+                    <button class="btn btn--primary explore-area-btn">探索する</button>
+                </div>
+                <div class="moss-area" data-area="alpine">
+                    <h3>🏔️ 雪上コケ（高山）</h3>
+                    <p>雪解け水で育つ高山の特殊なコケ</p>
+                    <div class="area-stats">
+                        <span>湿度: 70%</span> | <span>温度: 5°C</span>
+                    </div>
+                    <button class="btn btn--primary explore-area-btn">探索する</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 図鑑画面 -->
+        <section class="screen" id="collection-screen" style="display: none;">
+            <div class="screen-header">
+                <h2>📚 クマムシ図鑑</h2>
+                <button class="btn btn--outline" id="back-to-main-2">メインに戻る</button>
+            </div>
+            <div class="rarity-filter">
+                <button class="filter-btn active" data-rarity="all">全て</button>
+                <button class="filter-btn" data-rarity="コモン">コモン</button>
+                <button class="filter-btn" data-rarity="アンコモン">アンコモン</button>
+                <button class="filter-btn" data-rarity="レア">レア</button>
+                <button class="filter-btn" data-rarity="エピック">エピック</button>
+                <button class="filter-btn" data-rarity="レジェンダリー">レジェンダリー</button>
+            </div>
+            <div class="collection-grid" id="collection-grid">
+                <!-- 図鑑エントリがここに表示される -->
+            </div>
+        </section>
+
+        <!-- 合成画面 -->
+        <section class="screen" id="breeding-screen" style="display: none;">
+            <div class="screen-header">
+                <h2>🧬 クマムシ合成</h2>
+                <button class="btn btn--outline" id="back-to-main-3">メインに戻る</button>
+            </div>
+            <div class="breeding-area">
+                <div class="parent-selection">
+                    <div class="parent-slot" id="parent1">
+                        <div class="slot-placeholder">親1を選択</div>
+                    </div>
+                    <div class="breeding-symbol">+</div>
+                    <div class="parent-slot" id="parent2">
+                        <div class="slot-placeholder">親2を選択</div>
+                    </div>
+                    <div class="breeding-symbol">=</div>
+                    <div class="result-slot" id="breeding-result">
+                        <div class="slot-placeholder">？</div>
+                    </div>
+                </div>
+                <div class="breeding-controls">
+                    <div class="success-rate" id="success-rate">成功率: --</div>
+                    <button class="btn btn--primary" id="breed-btn" disabled>合成実行</button>
+                </div>
+                <div class="available-tardigrades" id="breeding-selection">
+                    <!-- 選択可能なクマムシがここに表示される -->
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 合成画面 -->
+        <section class="screen" id="breeding-screen" style="display: none;">
+            <div class="screen-header">
+                <h2>🧬 クマムシ合成</h2>
+                <button class="btn btn--outline" id="back-to-main-3">メインに戻る</button>
+            </div>
+            <div class="breeding-area">
+                <div class="parent-selection">
+                    <div class="parent-slot" id="parent1">
+                        <div class="slot-placeholder">親1を選択</div>
+                    </div>
+                    <div class="breeding-symbol">+</div>
+                    <div class="parent-slot" id="parent2">
+                        <div class="slot-placeholder">親2を選択</div>
+                    </div>
+                    <div class="breeding-symbol">=</div>
+                    <div class="result-slot" id="breeding-result">
+                        <div class="slot-placeholder">？</div>
+                    </div>
+                </div>
+                <div class="breeding-controls">
+                    <div class="success-rate" id="success-rate">成功率: --</div>
+                    <button class="btn btn--primary" id="breed-btn" disabled>合成実行</button>
+                </div>
+                <div class="available-tardigrades" id="breeding-selection">
+                    <!-- 選択可能なクマムシがここに表示される -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 防衛画面 -->
+        <section class="screen" id="defense-screen" style="display: none;">
+            <div class="screen-header">
+                <h2>⚔️ 防衛システム</h2>
+                <button class="btn btn--outline" id="back-to-main-4">メインに戻る</button>
+            </div>
+            <div class="defense-area">
+                <div class="threat-status">
+                    <h3>🚨 脅威レベル</h3>
+                    <div class="threat-meter" id="threat-meter">
+                        <div class="threat-bar"></div>
+                    </div>
+                    <p>次の攻撃まで: <span id="next-attack">180分</span></p>
+                </div>
+                <div class="defense-setup">
+                    <h3>防衛配置</h3>
+                    <div class="defense-grid" id="defense-grid">
+                        <!-- 防衛ポジションがここに表示される -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ★★ 研究ラボ画面 ★★ -->
+        <section id="lab-screen" class="screen" style="display:none">
+            <div class="screen-header">
+                <h2>耐性研究ラボ</h2>
+                <button id="back-to-main-lab" class="btn btn--outline">戻る</button>
+            </div>
+            <div id="lab-tardigrade-list" class="lab-list"></div>
+        </section>
+
+
+        <!-- 詳細モーダル -->
+        <div class="modal" id="detail-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-title"></h3>
+                    <button class="modal-close" id="modal-close">&times;</button>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    <!-- 詳細情報がここに表示される -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn--secondary" id="modal-close-btn">閉じる</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 結果モーダル -->
+        <div class="modal" id="result-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="result-title"></h3>
+                </div>
+                <div class="modal-body" id="result-body">
+                    <!-- 結果がここに表示される -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn--primary" id="result-close-btn">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- クリプトビオシス効果 -->
+        <div class="cryptobiosis-effect" id="cryptobiosis-effect">
+            <div class="water-drop"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

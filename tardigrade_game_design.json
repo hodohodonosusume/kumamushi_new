@@ -1,0 +1,167 @@
+{
+  "title": "クマムシコレクション - 最強生物の秘密",
+  "genre": "コレクション・育成・戦略シミュレーション",
+  "target_audience": "全年齢対象（特に生物学に興味のある10歳以上）",
+  "core_mechanics": {
+    "collection_system": {
+      "total_species": "50種類以上",
+      "rarity_tiers": [
+        {
+          "tier": "コモン",
+          "probability": "60%",
+          "description": "基本的なクマムシ種"
+        },
+        {
+          "tier": "アンコモン",
+          "probability": "25%",
+          "description": "特殊な能力を持つ種"
+        },
+        {
+          "tier": "レア",
+          "probability": "10%",
+          "description": "美しい色彩や特異な形状"
+        },
+        {
+          "tier": "エピック",
+          "probability": "4%",
+          "description": "巨大なサイズや特殊能力"
+        },
+        {
+          "tier": "レジェンダリー",
+          "probability": "1%",
+          "description": "共食い種や神話級の能力"
+        }
+      ]
+    },
+    "exploration_system": {
+      "moss_types": [
+        {
+          "name": "ギンゴケ",
+          "habitat": "都市部",
+          "species_found": [
+            "基本クマムシ",
+            "ヒメクマムシ"
+          ]
+        },
+        {
+          "name": "ハイゴケ",
+          "habitat": "森林",
+          "species_found": [
+            "ヨコヅナクマムシ",
+            "チビクマムシ"
+          ]
+        },
+        {
+          "name": "スナゴケ",
+          "habitat": "乾燥地",
+          "species_found": [
+            "サバククマムシ",
+            "カタクマムシ"
+          ]
+        },
+        {
+          "name": "ミズゴケ",
+          "habitat": "湿地",
+          "species_found": [
+            "ミズクマムシ",
+            "ドゥジャルダンヤマクマムシ"
+          ]
+        },
+        {
+          "name": "雪上コケ",
+          "habitat": "高山",
+          "species_found": [
+            "ユキクマムシ",
+            "グレイシャークマムシ"
+          ]
+        }
+      ]
+    },
+    "cryptobiosis_system": {
+      "trigger_conditions": [
+        "乾燥レベル > 80%",
+        "温度 < -10°C または > 60°C",
+        "放射線レベル > 5000Gy",
+        "敵の攻撃時の防御行動"
+      ],
+      "survival_mechanics": {
+        "trehalose_level": "体内トレハロース濃度が生存率に影響",
+        "body_size": "大型個体ほど成功率が低下",
+        "species_factor": "種によって得意な環境が異なる",
+        "revival_chance": "85-98%（条件により変動）"
+      }
+    },
+    "breeding_system": {
+      "fusion_types": [
+        {
+          "type": "同種繁殖",
+          "success_rate": "95%",
+          "result": "能力値向上"
+        },
+        {
+          "type": "近縁種交配",
+          "success_rate": "70%",
+          "result": "新能力獲得"
+        },
+        {
+          "type": "異種合成",
+          "success_rate": "30%",
+          "result": "レアハイブリッド"
+        }
+      ],
+      "genetic_traits": [
+        "耐乾燥性",
+        "耐寒性",
+        "耐熱性",
+        "耐放射線性",
+        "移動速度",
+        "繁殖力",
+        "サイズ",
+        "色彩パターン"
+      ]
+    },
+    "defense_system": {
+      "predator_attacks": {
+        "frequency": "3-6時間に1回",
+        "predator_types": [
+          "オニクマムシ",
+          "カニバルクマムシ",
+          "ハンタークマムシ"
+        ],
+        "defense_options": [
+          "クリプトビオシス発動",
+          "防衛クマムシの配置",
+          "環境操作（湿度調整）"
+        ]
+      }
+    }
+  },
+  "enhanced_features": {
+    "research_lab": {
+      "description": "クマムシの能力を研究・強化する施設",
+      "upgrades": [
+        "顕微鏡レベル",
+        "培養技術",
+        "遺伝子解析"
+      ]
+    },
+    "ecosystem_management": {
+      "environmental_factors": [
+        "湿度（0-100%）",
+        "温度（-273°C to 100°C）",
+        "日光レベル（0-100%）",
+        "栄養素（糖類、タンパク質）"
+      ]
+    },
+    "social_features": {
+      "trading_system": "他プレイヤーとのクマムシ交換",
+      "leaderboards": "コレクション数、レア度、研究成果",
+      "guild_system": "クマムシ愛好家コミュニティ"
+    },
+    "educational_content": {
+      "scientific_facts": "実際のクマムシ研究に基づく情報",
+      "discovery_journal": "新種発見時の学術的説明",
+      "evolution_tree": "クマムシの進化系統図"
+    }
+  }
+}
