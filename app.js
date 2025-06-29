@@ -1089,22 +1089,62 @@ class TardigradeGame {
 
     /* ====== ★★ イベントリスナー追加 ★★ ====== */
     initializeEventListeners() {
-        /* 既存リスナー… */                                     // main/explore/breeding など[1]
-        document.getElementById('explore-btn').addEventListener('click', () => this.showScreen('explore'));
-        /* ----- 新規 ----- */
-        document.getElementById('lab-btn').addEventListener('click', () => this.openLab());
-        /* 研究ラボ内ボタンは毎回描画後に付与 */
-        document.getElementById('lab-tardigrade-list').addEventListener('click', e => {
-            if (e.target.classList.contains('exp-btn')) {
-                const id = Number(e.target.parentElement.dataset.id);
-                const type = e.target.dataset.type;
-                this.performExperiment(id, type);
-            } else if (e.target.classList.contains('release-btn')) {
-                const id = Number(e.target.dataset.id);
-                this.releaseTardigrade(id);
-            }
-        });
-    }
+    document.addEventListener('click', (e) => {
+        /* ==== 画面遷移 ==== */
+        if (e.target.id === 'explore-btn')     return this.showScreen('explore');
+        if (e.target.id === 'collection-btn')  return this.showScreen('collection');
+        if (e.target.id === 'breeding-btn')    return this.showScreen('breeding');
+        if (e.target.id === 'defense-btn')     return this.showScreen('defense');
+        if (e.target.id === 'lab-btn')         return this.openLab();
+
+        /* ==== 戻るボタン（id が back-to-main で始まる物をまとめて処理） ==== */
+        if (e.target.id && e.target.id.startsWith('back-to-main')) {
+            return this.showScreen('main');
+        }
+
+        /* ==== 苔エリア探索 ==== */
+        if (e.target.classList.contains('explore-area-btn')) {
+            const area = e.target.closest('.moss-area').dataset.area;
+            return this.exploreArea(area);
+        }
+
+        /* ==== コレクションフィルタ ==== */
+        if (e.target.classList.contains('filter-btn')) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            return this.filterCollection(e.target.dataset.rarity);
+        }
+
+        /* ==== 合成 ==== */
+        if (e.target.id === 'breed-btn') {
+            return this.performBreeding();
+        }
+
+        /* ==== モーダル系 ==== */
+        if (e.target.id === 'modal-close'      || e.target.id === 'modal-close-btn')
+            return this.closeModal();
+        if (e.target.id === 'result-close-btn')
+            return this.closeResultModal();
+        if (e.target.id === 'detail-modal')    // 背景クリック
+            return this.closeModal();
+        if (e.target.id === 'result-modal')
+            return this.closeResultModal();
+
+        /* ==== 逃がす ==== */
+        if (e.target.classList.contains('release-btn')) {
+            const tid = Number(e.target.dataset.id);
+            return this.releaseTardigrade(tid);
+        }
+
+        /* ==== 研究ラボの実験 ==== */
+        if (e.target.classList.contains('exp-btn')) {
+            const tid  = Number(e.target.closest('.lab-actions').dataset.id);
+            const type = e.target.dataset.type;
+            return this.performExperiment(tid, type);
+        }
+    });
+}
+
 
     /* ====== ★★ 画面遷移に lab を追加 ★★ ====== */
     showScreen(screenName) {
