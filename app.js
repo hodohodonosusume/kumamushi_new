@@ -602,53 +602,61 @@ class TardigradeGame {
         return 30; // 異種
     }
 
+    /* ==========================
+     * 　合成（ブリーディング）
+     * ========================== */
     performBreeding() {
-        if (this.gameState.colony.length >= 8) {
-            this.showResultModal('合成失敗', 'コロニーが満杯です！空きスロットを作ってください。', 'error');
+        const [p1, p2] = this.selectedParents;
+        if (!p1 || !p2 || p1 === p2) {
+            alert('親を２匹選択してください');
             return;
         }
-
-        const successRate = this.calculateBreedingSuccess();
-        const success = Math.random() * 100 < successRate;
-        
-        if (success) {
-            // 新個体生成
-            let newSpeciesId;
-            const species1 = this.tardigradeDatabase.get(this.selectedParents[0].speciesId);
-            const species2 = this.tardigradeDatabase.get(this.selectedParents[1].speciesId);
-            
-            if (species1.id === species2.id) {
-                // 同種の場合、改良個体
-                newSpeciesId = species1.id;
-            } else {
-                // 異種の場合、ランダム選択またはレアハイブリッド
-                if (Math.random() < 0.15) { // 15%でレアハイブリッド
-                    newSpeciesId = this.createHybrid(species1, species2);
-                } else {
-                    newSpeciesId = Math.random() < 0.5 ? species1.id : species2.id;
-                }
-            }
-            
+    
+        const parent1 = this.gameState.colony.find(t => t.id === p1);
+        const parent2 = this.gameState.colony.find(t => t.id === p2);
+        if (!parent1 || !parent2) {
+            alert('選択したクマムシが見つかりません');
+            return;
+        }
+    
+        /* ---- 成功率判定 ---- */
+        const sameSpecies   = parent1.speciesId === parent2.speciesId;
+        const successRate   = sameSpecies ? 0.95 :               // 同種繁殖
+                              (this.tardigradeDatabase.get(parent1.speciesId).rarity ===
+                               this.tardigradeDatabase.get(parent2.speciesId).rarity) ? 0.70 : 0.30; // 近縁 or 異種
+        const isSuccess = Math.random() < successRate;
+    
+        /* ---- 親２匹を消滅させる ---- */
+        this.gameState.colony = this.gameState.colony.filter(
+            t => t.id !== p1 && t.id !== p2
+        );
+    
+        /* ---- 成功処理 ---- */
+        if (isSuccess) {
+            // 子の種IDは簡易版として 50%-50% で抽選
+            const childSpeciesId = Math.random() < 0.5 ? parent1.speciesId : parent2.speciesId;
             const newTardigrade = {
                 id: Date.now() + Math.random(),
-                speciesId: newSpeciesId,
+                speciesId: childSpeciesId,
                 cryptobiosis: false,
                 nutrition: 100,
                 age: 0
             };
             this.gameState.colony.push(newTardigrade);
-            this.gameState.collection.add(newSpeciesId);
-            
-            const newSpecies = this.tardigradeDatabase.get(newSpeciesId);
-            this.showResultModal('合成成功！', `🎉 ${newSpecies.name} が誕生しました！<br><br>${newSpecies.description}`, 'success');
+            this.gameState.collection.add(childSpeciesId);
+    
+            const childName = this.tardigradeDatabase.get(childSpeciesId).name;
+            this.showResultModal('合成成功', `${childName} が誕生しました！`, 'success');
         } else {
-            this.showResultModal('合成失敗', '合成に失敗しました...<br>再度挑戦してください。', 'error');
+            this.showResultModal('合成失敗', '合成は失敗しました。親クマムシは消滅しました。', 'error');
         }
-        
+
+        /* ---- UIリセット ---- */
         this.selectedParents = [null, null];
-        this.updateBreedingUI();
-        this.updateUI();
+        this.updateBreedingDisplay();
+        this.updateColonyDisplay();
     }
+
 
     createHybrid(species1, species2) {
         // 両親より高レア度の新種IDを返す
@@ -1087,28 +1095,39 @@ class TardigradeGame {
         this.updateColonyDisplay();
     }
 
-    /* ====== ★★ イベントリスナー追加 ★★ ====== */
     initializeEventListeners() {
     document.addEventListener('click', (e) => {
-        /* ==== 画面遷移 ==== */
-        if (e.target.id === 'explore-btn')     return this.showScreen('explore');
-        if (e.target.id === 'collection-btn')  return this.showScreen('collection');
-        if (e.target.id === 'breeding-btn')    return this.showScreen('breeding');
-        if (e.target.id === 'defense-btn')     return this.showScreen('defense');
-        if (e.target.id === 'lab-btn')         return this.openLab();
 
-        /* ==== 戻るボタン（id が back-to-main で始まる物をまとめて処理） ==== */
-        if (e.target.id && e.target.id.startsWith('back-to-main')) {
+        /* ==== 画面遷移 ==== */
+        if (e.target.id === 'explore-btn')      return this.showScreen('explore');
+        if (e.target.id === 'collection-btn')   return this.showScreen('collection');
+        if (e.target.id === 'breeding-btn')     return this.showScreen('breeding');
+        if (e.target.id === 'defense-btn')      return this.showScreen('defense');
+        if (e.target.id === 'lab-btn')          return this.openLab();
+        if (e.target.id && e.target.id.startsWith('back-to-main'))
             return this.showScreen('main');
+
+        /* ==== 逃がす ==== */
+        if (e.target.classList.contains('release-btn')) {
+            const tid = Number(e.target.dataset.id);
+            return this.releaseTardigrade(tid);
         }
 
-        /* ==== 苔エリア探索 ==== */
+        /* ==== ラボ実験 ==== */
+        if (e.target.classList.contains('exp-btn')) {
+            e.stopPropagation();                             // 逃がす判定と衝突しないように
+            const tid  = Number(e.target.closest('.lab-actions').dataset.id);
+            const type = e.target.dataset.type;              // 'hit' | 'heat' | 'cold'
+            return this.performExperiment(tid, type);
+        }
+
+        /* ==== 苔探索 ==== */
         if (e.target.classList.contains('explore-area-btn')) {
             const area = e.target.closest('.moss-area').dataset.area;
             return this.exploreArea(area);
         }
 
-        /* ==== コレクションフィルタ ==== */
+        /* ==== 図鑑フィルタ ==== */
         if (e.target.classList.contains('filter-btn')) {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
@@ -1120,28 +1139,15 @@ class TardigradeGame {
             return this.performBreeding();
         }
 
-        /* ==== モーダル系 ==== */
-        if (e.target.id === 'modal-close'      || e.target.id === 'modal-close-btn')
+        /* ==== モーダル ==== */
+        if (e.target.id === 'modal-close' || e.target.id === 'modal-close-btn')
             return this.closeModal();
         if (e.target.id === 'result-close-btn')
             return this.closeResultModal();
-        if (e.target.id === 'detail-modal')    // 背景クリック
+        if (e.target.id === 'detail-modal' && e.target === e.currentTarget)
             return this.closeModal();
-        if (e.target.id === 'result-modal')
+        if (e.target.id === 'result-modal' && e.target === e.currentTarget)
             return this.closeResultModal();
-
-        /* ==== 逃がす ==== */
-        if (e.target.classList.contains('release-btn')) {
-            const tid = Number(e.target.dataset.id);
-            return this.releaseTardigrade(tid);
-        }
-
-        /* ==== 研究ラボの実験 ==== */
-        if (e.target.classList.contains('exp-btn')) {
-            const tid  = Number(e.target.closest('.lab-actions').dataset.id);
-            const type = e.target.dataset.type;
-            return this.performExperiment(tid, type);
-        }
     });
 }
 
